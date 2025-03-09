@@ -64,9 +64,6 @@ def _framework_middleman(ctx):
                 resource_providers.append(lib_dep[AppleResourceInfo])
         if apple_common.Objc in lib_dep:
             objc_providers.append(lib_dep[apple_common.Objc])
-        if apple_common.AppleDynamicFramework in lib_dep:
-            dynamic_frameworks.append(lib_dep)
-            dynamic_framework_providers.append(lib_dep[apple_common.AppleDynamicFramework])
 
     for dep in ctx.attr.framework_deps:
         _process_dep(dep)
@@ -78,7 +75,6 @@ def _framework_middleman(ctx):
 
     # Here we only need to loop a subset of the keys
     objc_provider_fields = objc_provider_utils.merge_objc_providers_dict(providers = objc_providers, merge_keys = [
-        "dynamic_framework_file",
     ])
 
     # Add the frameworks to the objc provider for Bazel <= 6
@@ -265,23 +261,9 @@ def _dep_middleman(ctx):
 
     # Construct & merge the ObjcProvider, the linking information is only used in Bazel <= 6
     objc_provider_fields = objc_provider_utils.merge_objc_providers_dict(providers = objc_providers, merge_keys = [
-        "force_load_library",
-        "imported_library",
-        "library",
-        "link_inputs",
-        "linkopt",
-        "sdk_dylib",
-        "sdk_framework",
-        "source",
-        "static_framework_file",
-        "weak_sdk_framework",
     ])
 
     # Ensure to strip out static link inputs
-    _dedupe_key("library", avoid_libraries, objc_provider_fields)
-    _dedupe_key("force_load_library", avoid_libraries, objc_provider_fields)
-    _dedupe_key("imported_library", avoid_libraries, objc_provider_fields, check_name = True)
-    _dedupe_key("static_framework_file", avoid_libraries, objc_provider_fields, check_name = True)
 
     if "sdk_dylib" in objc_provider_fields:
         # Put sdk_dylib at _end_ of the linker invocation. Apple's linkers have

@@ -180,14 +180,6 @@ def _file_collector_rule_impl(ctx):
         fail("using import_middleman ({}) on wrong transition ({},{},is_device={})".format(ctx.attr.name, platform, arch, ctx.fragments.apple.single_arch_platform.is_device))
 
     merge_keys = [
-        "sdk_dylib",
-        "sdk_framework",
-        "weak_sdk_framework",
-        "force_load_library",
-        "source",
-        "link_inputs",
-        "linkopt",
-        "library",
     ]
 
     objc_provider_fields = objc_provider_utils.merge_objc_providers_dict(
